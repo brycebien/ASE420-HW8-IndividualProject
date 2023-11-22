@@ -2,6 +2,8 @@ import sqlite3
 connection = sqlite3.connect("HW-8.db")
 cur = connection.cursor()
 
+#use CRUD opperations to query the database -- store this in utility?
+
 #cur.execute("drop table records")
 cur.execute('''
             CREATE TABLE IF NOT EXISTS records(
@@ -15,7 +17,7 @@ cur.execute('''
 ''')
 connection.commit()
 
-user_input = input('enter a query tag\n')
-res = cur.execute("SELECT * FROM records WHERE Tag = '" + user_input + "'")
-
-print(res.fetchall())
+while(True):        
+    user_input = input('enter a command\n')
+    # res = cur.execute("SELECT * FROM records WHERE Tag = '" + user_input + "'")
+    # print(res.fetchall())
