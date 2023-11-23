@@ -1,4 +1,5 @@
 from shlex import split as shlex_split
+from datetime import datetime
 from abc import ABC, abstractmethod
 import re
 from dateutil import parser
@@ -42,8 +43,10 @@ class RecordCommand(Command):
     def execute(self):
         if self.record_validator.validate(self.input):
             inputs = shlex_split(self.input)
-            date = self.date_parser.parse(inputs[0])
-            inputs[0] = date
+            if inputs[0].lower() == 'today':
+                inputs[0] = datetime.now().strftime("%Y/%m/%d")
+            else:
+                inputs[0] = self.dateself.date_parser.parse(inputs[0])
             self.time_tracker.record(inputs)
         else:
             print("Invalid record input format. Please use DATE FROM TO TASK TAG format")
