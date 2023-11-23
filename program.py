@@ -1,4 +1,6 @@
 import sqlite3
+from src.utility import Console
+
 connection = sqlite3.connect("HW-8.db")
 cur = connection.cursor()
 
@@ -18,6 +20,7 @@ cur.execute('''
 connection.commit()
 
 while(True):        
-    user_input = input('enter a command\n')
-    # res = cur.execute("SELECT * FROM records WHERE Tag = '" + user_input + "'")
-    # print(res.fetchall())
+    console = Console()
+    user_input = input("Enter a command (record DATE FROM TO TASK TAG)(query :TAG or DATE or TASK)")
+    console.processCommand(user_input)
+    console.runCommands()
