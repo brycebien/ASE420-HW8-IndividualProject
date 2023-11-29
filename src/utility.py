@@ -21,6 +21,7 @@ class TimeTracker(object):
     def record(self, inputs):
         print(inputs)
         date, start_time, end_time, task, tag = inputs
+        tag = tag.upper()
         #TODO: implement entry to SQLite
         print(f"Recorded: {date} {start_time} - {end_time} - {task} - {tag}")
 
@@ -49,7 +50,7 @@ class RecordCommand(Command):
                 inputs[0] = self.dateself.date_parser.parse(inputs[0])
             self.time_tracker.record(inputs)
         else:
-            print("Invalid record input format. Please use DATE FROM TO TASK TAG format")
+            print("Invalid record input format. Please use DATE FROM TO TASK :TAG format")
 
 class Console(object):
     def __init__(self):
