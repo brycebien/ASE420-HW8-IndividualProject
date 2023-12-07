@@ -1,8 +1,9 @@
-from shlex import split as shlex_split
 from datetime import datetime
+from shlex import split as shlex_split
 from abc import ABC, abstractmethod
 import re
 from dateutil import parser
+from src.database import Database, QueryDatabase, RecordDatabase
 
 
 class RecordValidator(object):
@@ -18,12 +19,16 @@ class DateParser(object):
 
 
 class TimeTracker(object):
+    def __init__(self):
+        self.database = Database('HW-8.db')
+        self.query_database = QueryDatabase('HW-8.db')
+        self.record_database = RecordDatabase('HW-8.db')
+
     def record(self, inputs):
         print(inputs)
         date, start_time, end_time, task, tag = inputs
         tag = tag.upper()
-        #TODO: implement entry to SQLite
-        print(f"Recorded: {date} {start_time} - {end_time} - {task} - {tag}")
+        self.record_database.record(date, start_time, end_time, task, tag)
 
     def query(self, parameter):
         #TODO: implementation to query from SQLite
@@ -58,6 +63,7 @@ class Console(object):
         self.record_validator = RecordValidator()
         self.date_parser = DateParser()
         self.commands = []
+
 
     def addCommand(self, command):
         self.commands.append(command)
