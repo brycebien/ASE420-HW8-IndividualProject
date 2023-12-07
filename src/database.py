@@ -1,3 +1,5 @@
+from datetime import datetime
+import re
 import sqlite3
 
 class Database:
@@ -28,9 +30,16 @@ class QueryDatabase(Database):
 
     def query(self, query):
         try:
-            self.cur.execute('''SELECT * FROM records
-                            WHERE DATE = ?
-                            ''', query)
+           # query = query[0]
+            if query.lower() == 'today': #records from today's date
+                date = datetime.now().strftime("%Y/%m/%d")
+                self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(date,))
+            elif re.match(r'\d{4}/\d{2}/\d{2}', query): #records from certain date
+                self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(query,))
+            elif query.startswith(':'): #records with a certain tag
+                self.cur.execute('''SELECT * FROM records WHERE TAG = ?''',(query,))
+            else: #records with a certain task
+                self.cur.execute('''SELECT * FROM records WHERE TASK = ?''',(query,))
             return self.cur.fetchall()
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
