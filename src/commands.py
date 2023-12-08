@@ -1,8 +1,6 @@
 import argparse
 from datetime import datetime
-from shlex import split as shlex_split
 from abc import ABC, abstractmethod
-import re
 from dateutil import parser
 from src.database import Database, QueryDatabase, RecordDatabase, DeleteDatabase
     
@@ -56,11 +54,6 @@ class QueryCommand(Command):
         self.date_parser = DateParser()
     
     def execute(self, command):
-        # if command.query.startswith(':'):
-        #     print('query a tag')
-        # elif self.date_parser.parse(command.query) is not None:
-        #     self.db_manager.query(command.query)
-        # else: print(f'query sting:{command.query}')
         if self.date_parser.parse(command.query) is not None:
             self.db_manager.query(self.date_parser.parse(command.query), 'date')
         elif command.query.startswith(':'):
