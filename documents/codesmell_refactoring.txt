@@ -28,4 +28,4 @@ Code Smell - Duplicate code (databse.py lines 41, 52, 63)
 Link to Github where codesmell can be found
 https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/75ee9e2509128bf8d77fb65376adf1c5e6c28460/src/database.py
 Link to GitHub with Refactoring
-https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/c871e47b9fca484f74c323f86f557d6f0696cb77/src/database.py
+https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/f411681dbd69dda4421b01236bc8a70b7b862147/src/database.py
