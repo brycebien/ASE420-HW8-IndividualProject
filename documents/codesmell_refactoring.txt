@@ -5,3 +5,11 @@ link to GitHub where codesmell can be found (program.py lines 6-8  src/commands 
 https://github.com/brycebien/ASE420-HW8-IndividualProject/tree/a100cec4e09b9e0722aa87c7537e5944b37b32d3
 link to GitHub with Refactoring
 https://github.com/brycebien/ASE420-HW8-IndividualProject/tree/0a937eab4c2b671edc86f31fe4a9432f3d465279
+
+codesmell found on 12/07/2023
+Code Smell - Magic Number
+    Refactoring - Declare a constant
+Link to GitHub where codesmell can be found
+https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/cb91f69af18a6379a94618391ecb0ac69a3743a9/src/commands.py
+Link to GitHub with Refactoring
+https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/e44aa01aa6ec1cd55c2968c56690c4e9187adb1b/src/commands.py

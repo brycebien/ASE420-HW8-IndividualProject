@@ -87,7 +87,11 @@ class Console(object):
         self.query_manager = QueryCommand()
         self.delete_manager = DeleteCommand()
 
-    def processCommand(self, command):
+    def run(self):
+        args = self.__parseArgs()
+        self.__processCommand(args)
+
+    def __processCommand(self, command):
         if command.command == 'record':
             return self.record_manager.execute(command)
         if command.command == 'query':
@@ -95,7 +99,7 @@ class Console(object):
         if command.command == 'delete':
             return self.delete_manager.execute()
         
-    def parseArgs(self):
+    def __parseArgs(self):
         parser = argparse.ArgumentParser(description='Time Tracker')
         subparsers = parser.add_subparsers(dest='command', help='Commands')
 
