@@ -3,6 +3,8 @@ from datetime import datetime
 from abc import ABC, abstractmethod
 from dateutil import parser
 from src.database import Database, QueryDatabase, RecordDatabase, DeleteDatabase
+
+DATABASE = 'HW-8.db'
     
 class Command(ABC):
     @abstractmethod
@@ -13,18 +15,17 @@ class DateParser(object):
     @staticmethod
     def parse(date_in):
         try:
-            if date_in.lower() == 'today':
-                return datetime.now().strftime("%Y/%m/%d")
+            if date_in.lower() == 'today': return datetime.now().strftime("%Y/%m/%d")
             return parser.parse(date_in).strftime("%Y/%m/%d")
         except ValueError:
             return None
     
 class DatabaseManager(object):
     def __init__(self):
-        self.database = Database('HW-8.db')
-        self.query_database = QueryDatabase('HW-8.db')
-        self.record_database = RecordDatabase('HW-8.db')
-        self.delete_database = DeleteDatabase('HW-8.db')
+        self.database = Database(DATABASE)
+        self.query_database = QueryDatabase(DATABASE)
+        self.record_database = RecordDatabase(DATABASE)
+        self.delete_database = DeleteDatabase(DATABASE)
 
     def record(self, inputs):
         print(inputs)
