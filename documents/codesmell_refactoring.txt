@@ -22,4 +22,10 @@ https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/e44aa01aa6ec1cd55
 Link to GitHub with Refactoring
 https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/2e95ce81bf7e7d7fdb93f4f8a2a1075c34e19a48/src/commands.py
 
+Code Smell found on 12/08/2023
+Code Smell - Duplicate code (databse.py lines 41, 52, 63)
+    Refactoring - extract method (lines 90-100)
+Link to Github where codesmell can be found
+https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/75ee9e2509128bf8d77fb65376adf1c5e6c28460/src/database.py
+
 

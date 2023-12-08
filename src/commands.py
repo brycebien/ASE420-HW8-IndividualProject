@@ -16,12 +16,7 @@ class DatabaseManager(object):
         self.__record_database.record(inputs)
 
     def query(self, parameter, method): 
-        if method == 'date':
-            self.__query_database.queryDate(parameter)
-        elif method == 'tag':
-            self.__query_database.queryTag(parameter)
-        else:
-            self.__query_database.queryTask(parameter)
+        self.__query_database.query(parameter,method)
     
     def queryAll(self):
         return self.__query_database.queryAll()

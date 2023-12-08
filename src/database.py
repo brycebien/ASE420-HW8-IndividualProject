@@ -86,6 +86,18 @@ class QueryDatabase(Database):
 
     def __printNotFound(self):
         print('No records found')
+
+    def query(self, query, method):
+        sql_query = f'SELECT * FROM records WHERE {method.upper()} = ?'
+        try:
+            self.cur.execute(sql_query,(query,))
+            self.res = self.cur.fetchall()
+            if self.res == []:
+                self.__printNotFound()
+            else:
+                self.__printQuery()
+        except sqlite3.Error as e:
+            print("SQL QUERY ERROR: ", e) 
     
 class RecordDatabase(Database):
     def __init__(self, database):
