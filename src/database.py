@@ -24,6 +24,14 @@ class Database:
         except sqlite3.Error as e:
             print("CREATE DATABASE ERROR: ", e)
 
+class DeleteDatabase(Database):
+    def __init__(self, database):
+        super().__init__(database)
+
+    def delete(self):
+       self.cur.execute('''DROP TABLE records;''')
+       self.connection.commit()
+
 class QueryDatabase(Database):
     def __init__(self, database):
         super().__init__(database)
