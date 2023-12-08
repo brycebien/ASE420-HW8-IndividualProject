@@ -1,5 +1,5 @@
 import argparse
-from datetime import datetime
+from datetime import datetime, timedelta
 from abc import ABC, abstractmethod
 from dateutil import parser
 from src.database import Database, QueryDatabase, RecordDatabase, DeleteDatabase
@@ -19,6 +19,17 @@ class DateParser(object):
             return parser.parse(date_in).strftime("%Y/%m/%d")
         except ValueError:
             return None
+        
+    @staticmethod
+    def days_between(start, end):
+        start_str = DateParser.parse(start)
+        end_str = DateParser.parse(end)
+
+        start = datetime.strptime(start_str, '%Y/%m/%d')
+        end = datetime.strptime(end_str, '%Y/%m/%d')
+        difference = end - start
+        return [(start + timedelta(days=i)).date().strftime('%Y/%m/%d') for i in range(difference.days + 1)]
+
     
 class DatabaseManager(object):
     def __init__(self):
@@ -28,7 +39,6 @@ class DatabaseManager(object):
         self.delete_database = DeleteDatabase(DATABASE)
 
     def record(self, inputs):
-        print(inputs)
         self.record_database.record(inputs)
 
     def query(self, parameter, method): 
@@ -52,11 +62,10 @@ class DeleteCommand(Command):
 class QueryCommand(Command):
     def __init__(self):
         self.db_manager = DatabaseManager()
-        self.date_parser = DateParser()
     
     def execute(self, command):
-        if self.date_parser.parse(command.query) is not None:
-            self.db_manager.query(self.date_parser.parse(command.query), 'date')
+        if DateParser.parse(command.query) is not None:
+            self.db_manager.query(DateParser.parse(command.query), 'date')
         elif command.query.startswith(':'):
             self.db_manager.query(command.query.upper(), 'tag')
         else:
@@ -66,10 +75,9 @@ class QueryCommand(Command):
 class RecordCommand(Command):
     def __init__(self):
         self.db_manager = DatabaseManager()
-        self.date_parser = DateParser()
 
     def execute(self, command):
-        date = self.date_parser.parse(command.date)
+        date = DateParser.parse(command.date)
         start_time = command.start_time
         end_time = command.end_time
         task = command.task
@@ -77,15 +85,30 @@ class RecordCommand(Command):
             tag = ':' + command.tag.upper()
         else:
             tag = command.tag.upper()
-
         self.db_manager.record([date,start_time,end_time,task,tag])
-        print(f'ARGS::{date},{start_time},{end_time},{task},{tag}')
+        print(f'Recorded Record: {date}, {start_time}, {end_time}, \'{task}\', {tag}')
+
+class ReportCommand(Command):
+    def __init__(self):
+        self.db_manager = DatabaseManager()
+        self.db_manager = DatabaseManager()
+
+    def execute(self, command):
+        res = DateParser.days_between(command.start_date, command.end_date)
+        for day in res:
+            self.db_manager.query(day, 'date')
+        #query every date from start date to end date and add to list
+
+        #print list?
+        #self.query_database()
+
 
 class Console(object):
     def __init__(self):
         self.record_manager = RecordCommand()
         self.query_manager = QueryCommand()
         self.delete_manager = DeleteCommand()
+        self.report_manager = ReportCommand()
 
     def run(self):
         args = self.__parseArgs()
@@ -98,6 +121,8 @@ class Console(object):
             return self.query_manager.execute(command)
         if command.command == 'delete':
             return self.delete_manager.execute()
+        if command.command == 'report':
+            return self.report_manager.execute(command)
         
     def __parseArgs(self):
         parser = argparse.ArgumentParser(description='Time Tracker')
@@ -115,6 +140,10 @@ class Console(object):
 
         delete_parser = subparsers.add_parser('delete', help='Drop records from db')
         delete_parser.add_argument('drop_table', help='Drops all records in db')
+
+        report_parser = subparsers.add_parser('report', help='Report all records')
+        report_parser.add_argument('start_date', help='Start of date range for report')
+        report_parser.add_argument('end_date', help='End of date range for report')
 
 
         return parser.parse_args()

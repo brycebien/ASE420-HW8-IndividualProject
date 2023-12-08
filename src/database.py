@@ -37,14 +37,14 @@ class QueryDatabase(Database):
     def queryDate(self, query):
         try:
             self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(query,))
-            self._printQuery(self.cur.fetchall())
+            self.__printQuery(self.cur.fetchall())
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
 
     def queryTask(self, query):
         try:
             self.cur.execute('''SELECT * FROM records WHERE TASK = ?''',(query,))
-            self._printQuery(self.cur.fetchall())
+            self.__printQuery(self.cur.fetchall())
 
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
@@ -52,11 +52,11 @@ class QueryDatabase(Database):
     def queryTag(self, query):
         try:
             self.cur.execute('''SELECT * FROM records WHERE TAG = ?''',(query,))
-            self._printQuery(self.cur.fetchall())
+            self.__printQuery(self.cur.fetchall())
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
         
-    def _printQuery(self, res):
+    def __printQuery(self, res):
         for record in res:
             print(record)
 
