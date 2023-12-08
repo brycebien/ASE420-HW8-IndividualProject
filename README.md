@@ -18,8 +18,8 @@ pip install pytest
 
 ## How to use
 
-[user_manual_ver1](./documents/manual/user_manual_ver1.md)
-[user_manual_ver2](./documents/manual/user_manual_ver2.md)
+* [user_manual_ver1](./documents/manual/user_manual_ver1.md)
+* [user_manual_ver2](./documents/manual/user_manual_ver2.md)
 
 ## Testing
 
