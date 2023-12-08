@@ -36,27 +36,39 @@ class QueryDatabase(Database):
     def __init__(self, database):
         super().__init__(database)
 
-    def query(self, query):
+    def queryDate(self, query):
         try:
-           # query = query[0]
-            if query.lower() == 'today': #records from today's date
-                date = datetime.now().strftime("%Y/%m/%d")
-                self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(date,))
-            elif re.match(r'\d{4}/\d{2}/\d{2}', query): #records from certain date
-                self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(query,))
-            elif query.startswith(':'): #records with a certain tag
-                self.cur.execute('''SELECT * FROM records WHERE TAG = ?''',(query,))
-            else: #records with a certain task
-                self.cur.execute('''SELECT * FROM records WHERE TASK = ?''',(query,))
-            return self.cur.fetchall()
+            self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(query,))
+            self._printQuery(self.cur.fetchall())
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
+
+    def queryTask(self, query):
+        try:
+            self.cur.execute('''SELECT * FROM records WHERE TASK = ?''',(query,))
+            self._printQuery(self.cur.fetchall())
+
+        except sqlite3.Error as e:
+            print("SQL QUERY ERROR: ", e)
+
+    def queryTag(self, query):
+        try:
+            self.cur.execute('''SELECT * FROM records WHERE TAG = ?''',(query,))
+            self._printQuery(self.cur.fetchall())
+        except sqlite3.Error as e:
+            print("SQL QUERY ERROR: ", e)
+        
+    def _printQuery(self, res):
+        for record in res:
+            print(record)
+
     
 class RecordDatabase(Database):
     def __init__(self, database):
         super().__init__(database)
     
-    def record(self, date, start_time, end_time, task, tag):
+    def record(self, inputs):
+        date, start_time, end_time, task, tag = inputs
         try:
             self.cur.execute('''INSERT INTO records (DATE, FROM_TIME, TO_TIME, TASK, TAG)
                             VALUES (?, ?, ?, ?, ?);

@@ -30,15 +30,15 @@ class DatabaseManager(object):
 
     def record(self, inputs):
         print(inputs)
-        date, start_time, end_time, task, tag = inputs
-        tag = tag.upper()
-        self.record_database.record(date, start_time, end_time, task, tag)
+        self.record_database.record(inputs)
 
-    def query(self, parameter):
-        if parameter[0].startswith(':'):
-            parameter[0] = parameter[0].upper() 
-        res = self.query_database.query(parameter[0])
-        print(res)
+    def query(self, parameter, method): 
+        if method == 'date':
+            self.query_database.queryDate(parameter)
+        elif method == 'tag':
+            self.query_database.queryTag(parameter)
+        else:
+            self.query_database.queryTask(parameter)
 
     def delete(self):
         self.delete_database.delete()
@@ -56,11 +56,17 @@ class QueryCommand(Command):
         self.date_parser = DateParser()
     
     def execute(self, command):
-        if command.query.startswith(':'):
-            print('query a tag')
-        elif self.date_parser.parse(command.query) is not None:
-            print('query by date')
-        else: print(f'query sting:{command.query}')
+        # if command.query.startswith(':'):
+        #     print('query a tag')
+        # elif self.date_parser.parse(command.query) is not None:
+        #     self.db_manager.query(command.query)
+        # else: print(f'query sting:{command.query}')
+        if self.date_parser.parse(command.query) is not None:
+            self.db_manager.query(self.date_parser.parse(command.query), 'date')
+        elif command.query.startswith(':'):
+            self.db_manager.query(command.query.upper(), 'tag')
+        else:
+            self.db_manager.query(command.query, 'task')
 
 
 class RecordCommand(Command):
@@ -78,6 +84,7 @@ class RecordCommand(Command):
         else:
             tag = command.tag.upper()
 
+        self.db_manager.record([date,start_time,end_time,task,tag])
         print(f'ARGS::{date},{start_time},{end_time},{task},{tag}')
 
 class Console(object):
