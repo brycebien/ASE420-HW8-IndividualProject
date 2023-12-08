@@ -12,10 +12,9 @@ Time tracker application (ASE 420 individual project)
 * Report Date range
 * Priority tasks
 
-## Installation
+## Dependencies
 
-* Dependencies
-  * pip install pytest
+pip install pytest
 
 ## How to use
 
