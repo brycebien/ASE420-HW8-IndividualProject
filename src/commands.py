@@ -1,32 +1,27 @@
+import argparse
 from datetime import datetime
 from shlex import split as shlex_split
 from abc import ABC, abstractmethod
 import re
 from dateutil import parser
 from src.database import Database, QueryDatabase, RecordDatabase, DeleteDatabase
-
-
-class RecordValidator(object):
-    @staticmethod
-    def validate(record_in):
-        pattern = re.compile(r'^\S+\s+\S+\s+\S+\s+\'[^\']+\'\s+:\S+$')
-        return bool(pattern.match(record_in))
     
-class QueryValidator(object):
-    @staticmethod
-    def validate(query_in):
-        pattern = re.compile(r"^(?:today|\d{1,2}/\d{1,2}/\d{4}|\d{4}/\d{1,2}/\d{2}|'[^']*')?$")
-        return bool(pattern.match(query_in.strip()))
-    
+class Command(ABC):
+    @abstractmethod
+    def execute(self):
+        pass
+
 class DateParser(object):
     @staticmethod
     def parse(date_in):
         try:
+            if date_in.lower() == 'today':
+                return datetime.now().strftime("%Y/%m/%d")
             return parser.parse(date_in).strftime("%Y/%m/%d")
         except ValueError:
             return None
     
-class TimeTracker(object):
+class DatabaseManager(object):
     def __init__(self):
         self.database = Database('HW-8.db')
         self.query_database = QueryDatabase('HW-8.db')
@@ -48,76 +43,73 @@ class TimeTracker(object):
     def delete(self):
         self.delete_database.delete()
 
-class Command(ABC):
-    @abstractmethod
-    def execute(self):
-        pass
 
 class DeleteCommand(Command):
-    def __init__(self, inputs):
-        self.input = inputs
-        self.time_tracker = TimeTracker()
+    def __init__(self):
+        self.db_manager = DatabaseManager()
     def execute(self):
-        self.time_tracker.delete()
+        self.db_manager.delete()
 
 class QueryCommand(Command):
-    def __init__(self, inputs):
-        self.time_tracker = TimeTracker()
-        self.query_validator = QueryValidator()
+    def __init__(self):
+        self.db_manager = DatabaseManager()
         self.date_parser = DateParser()
-        self.input = inputs
     
-    def execute(self):
-        if self.query_validator.validate(self.input):
-            inputs = shlex_split(self.input)
-            date = self.date_parser.parse(inputs[0])
-            if date is not None:
-                self.time_tracker.query([date])
-            else:
-                self.time_tracker.query(inputs)
-        else:
-            print("Invalid query input format. Please use query DATE, query today, or query :TAG format")
+    def execute(self, command):
+        if command.query.startswith(':'):
+            print('query a tag')
+        elif self.date_parser.parse(command.query) is not None:
+            print('query by date')
+        else: print(f'query sting:{command.query}')
 
 
 class RecordCommand(Command):
-    def __init__(self, inputs):
-        self.time_tracker = TimeTracker()
-        self.record_validator = RecordValidator()
+    def __init__(self):
+        self.db_manager = DatabaseManager()
         self.date_parser = DateParser()
-        self.input = inputs
 
-    def execute(self):
-        if self.record_validator.validate(self.input):
-            inputs = shlex_split(self.input)
-            if inputs[0].lower() == 'today':
-                inputs[0] = datetime.now().strftime("%Y/%m/%d")
-            else:
-                inputs[0] = self.date_parser.parse(inputs[0])
-            self.time_tracker.record(inputs)
+    def execute(self, command):
+        date = self.date_parser.parse(command.date)
+        start_time = command.start_time
+        end_time = command.end_time
+        task = command.task
+        if not command.tag.startswith(':'):
+            tag = ':' + command.tag.upper()
         else:
-            print("Invalid record input format. Please use DATE FROM TO TASK :TAG format")
+            tag = command.tag.upper()
+
+        print(f'ARGS::{date},{start_time},{end_time},{task},{tag}')
 
 class Console(object):
     def __init__(self):
-        self.time_tracker = TimeTracker()
-        self.record_validator = RecordValidator()
-        self.date_parser = DateParser()
-        self.commands = []
+        self.record_manager = RecordCommand()
+        self.query_manager = QueryCommand()
+        self.delete_manager = DeleteCommand()
+
+    def processCommand(self, command):
+        if command.command == 'record':
+            return self.record_manager.execute(command)
+        if command.command == 'query':
+            return self.query_manager.execute(command)
+        if command.command == 'delete':
+            return self.delete_manager.execute()
+        
+    def parseArgs(self):
+        parser = argparse.ArgumentParser(description='Time Tracker')
+        subparsers = parser.add_subparsers(dest='command', help='Commands')
+
+        record_parser = subparsers.add_parser('record', help='Record a task')
+        record_parser.add_argument('date', help='Enter Date (any format) or "today"')
+        record_parser.add_argument('start_time', help='Enter a start time for the task')
+        record_parser.add_argument('end_time', help='Enter a end time for the task')
+        record_parser.add_argument('task', help='Enter what task you did enclosed with \' \'')
+        record_parser.add_argument('tag', help='Enter a tag - tags must start with a :')
+
+        query_parser = subparsers.add_parser('query', help='Enter query :TAG or DATE or \'TASK\'')
+        query_parser.add_argument('query', help='Enter query :TAG or DATE or \'TASK\'')
+
+        delete_parser = subparsers.add_parser('delete', help='Drop records from db')
+        delete_parser.add_argument('drop_table', help='Drops all records in db')
 
 
-    def addCommand(self, command):
-        self.commands.append(command)
-
-    def runCommands(self):
-        for command in self.commands:
-            command.execute()
-    
-    def processCommand(self, user_in):
-        if user_in.startswith("query "):
-            record_in = user_in[len("query "):]
-            self.addCommand(QueryCommand(record_in))
-        elif user_in.startswith("record "):
-            record_in = user_in[len("record "):]
-            self.addCommand(RecordCommand(record_in))
-        elif user_in == "drop":
-            self.addCommand(DeleteCommand(user_in))
+        return parser.parse_args()
