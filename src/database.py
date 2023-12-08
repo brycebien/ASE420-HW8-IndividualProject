@@ -36,39 +36,6 @@ class QueryDatabase(Database):
         super().__init__(database)
         self.res = ''
 
-    def queryDate(self, query):
-        try:
-            self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(query,))
-            self.res = self.cur.fetchall()
-            if self.res == []:
-                self.__printNotFound()
-            else:
-                self.__printQuery()
-        except sqlite3.Error as e:
-            print("SQL QUERY ERROR: ", e)
-
-    def queryTask(self, query):
-        try:
-            self.cur.execute('''SELECT * FROM records WHERE TASK = ?''',(query,))
-            self.res = self.cur.fetchall()
-            if self.res == []:
-                self.__printNotFound()
-            else:
-                self.__printQuery()
-        except sqlite3.Error as e:
-            print("SQL QUERY ERROR: ", e)
-
-    def queryTag(self, query):
-        try:
-            self.cur.execute('''SELECT * FROM records WHERE TAG = ?''',(query,))
-            self.res = self.cur.fetchall()
-            if self.res == []:
-                self.__printNotFound()
-            else:
-                self.__printQuery()
-        except sqlite3.Error as e:
-            print("SQL QUERY ERROR: ", e)
-
     def queryAll(self):
         try:
             self.cur.execute('''SELECT * FROM records''')
@@ -80,12 +47,6 @@ class QueryDatabase(Database):
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
         
-    def __printQuery(self):
-        for record in self.res:
-            print(record)
-
-    def __printNotFound(self):
-        print('No records found')
 
     def query(self, query, method):
         sql_query = f'SELECT * FROM records WHERE {method.upper()} = ?'
@@ -98,6 +59,13 @@ class QueryDatabase(Database):
                 self.__printQuery()
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e) 
+            
+    def __printQuery(self):
+        for record in self.res:
+            print(record)
+
+    def __printNotFound(self):
+        print('No records found')
     
 class RecordDatabase(Database):
     def __init__(self, database):
