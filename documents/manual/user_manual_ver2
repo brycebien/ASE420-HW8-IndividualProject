@@ -27,3 +27,22 @@ To query run 'python program.py query {command}' in the CUI.
 * query 12/03/2023
 * query 2023/12/08
 * query :STUDY
+
+## Report Feature
+
+### Introduction
+
+The report feature allows users to see a report of all the activities they completed within a date range.
+To print a report run 'report {date} {date}' in the CUI.
+
+### List of possible commands
+
+* report 12/08/2023 3/01/2024
+* report 2023/11/11 2023/12/25
+
+## Priority Feature
+
+### Introduction
+
+The priority feature allows users to see what activities they spend most of their time on.
+To run this command run 'priority' in the CUI.
