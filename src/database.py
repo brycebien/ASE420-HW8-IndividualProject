@@ -27,46 +27,65 @@ class DeleteDatabase(Database):
         super().__init__(database)
 
     def delete(self):
-       self.cur.execute('''DROP TABLE records;''')
+       self.cur.execute('''DELETE FROM records;''')
        self.connection.commit()
+       print('All records have been deleted')
 
 class QueryDatabase(Database):
     def __init__(self, database):
         super().__init__(database)
+        self.res = ''
 
     def queryDate(self, query):
         try:
             self.cur.execute('''SELECT * FROM records WHERE DATE = ?''',(query,))
-            self.__printQuery(self.cur.fetchall())
+            self.res = self.cur.fetchall()
+            if self.res == []:
+                self.__printNotFound()
+            else:
+                self.__printQuery()
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
 
     def queryTask(self, query):
         try:
             self.cur.execute('''SELECT * FROM records WHERE TASK = ?''',(query,))
-            self.__printQuery(self.cur.fetchall())
-
+            self.res = self.cur.fetchall()
+            if self.res == []:
+                self.__printNotFound()
+            else:
+                self.__printQuery()
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
 
     def queryTag(self, query):
         try:
             self.cur.execute('''SELECT * FROM records WHERE TAG = ?''',(query,))
-            self.__printQuery(self.cur.fetchall())
+            self.res = self.cur.fetchall()
+            if self.res == []:
+                self.__printNotFound()
+            else:
+                self.__printQuery()
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
 
     def queryAll(self):
         try:
             self.cur.execute('''SELECT * FROM records''')
-            return(self.cur.fetchall())
+            self.res = self.cur.fetchall()
+            if self.res == []:
+                self.__printNotFound()
+            else:
+                return self.res
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
         
-    def __printQuery(self, res):
-        for record in res:
+    def __printQuery(self):
+        for record in self.res:
             print(record)
 
+    def __printNotFound(self):
+        print('No records found')
     
 class RecordDatabase(Database):
     def __init__(self, database):
