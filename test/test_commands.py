@@ -1,31 +1,41 @@
 import pytest
-from src.commands import Console, ReportCommand, QueryCommand, RecordCommand, DeleteCommand, DatabaseManager
+from src.commands import Console, PriorityCommand, ReportCommand, QueryCommand, RecordCommand, DeleteCommand, DatabaseManager
 from unittest.mock import Mock
 
-def test_recordCommandExecute():
+def test_recordCommandExecute(capsys):
     command = Mock(command='record',date='12/12/2023',start_time='10:00',end_time='11:00',task='Studied Java',tag=':STUDIED')
     RecordCommand().execute(command)
-    assert "Recorded Record: 2023/12/12, 10:00, 11:00, 'Studied Java', :STUDY"
+    cap = capsys.readouterr()
+    assert "Recorded Record: 2023/12/12, 10:00, 11:00, 'Studied Java', :STUDIED\n" in cap.out
 
-def test_queryCommandExecuteTag():
+def test_queryCommandExecuteTag(capsys):
     command = Mock(command='query', query=':STUDIED')
     QueryCommand().execute(command)
-    assert "(1, 2023/12/12, 10:00, 11:00, 'Studied Java', :STUDY)"
+    cap = capsys.readouterr()
+    assert "(1, '2023/12/12', '10:00', '11:00', 'Studied Java', ':STUDIED')\n" in cap.out
 
-def test_queryCommandExecuteTask():
-    command = Mock(command='query', query='\'Studied Java\'')
+def test_queryCommandExecuteTask(capsys):
+    command = Mock(command='query', query='Studied Java')
     QueryCommand().execute(command)
-    assert "(1, 2023/12/12, 10:00, 11:00, 'Studied Java', :STUDY)"
+    cap = capsys.readouterr()
+    assert "No records found" not in cap.out
 
-def test_queryCommandExecuteDate():
+def test_queryCommandExecuteDate(capsys):
     command = Mock(command='query', query='12/12/2023')
     QueryCommand().execute(command)
-    assert "(1, 2023/12/12, 10:00, 11:00, 'Studied Java', :STUDY)"
+    cap = capsys.readouterr()
+    assert "No records found" not in cap.out
 
-def test_queryCommandExecuteNoRecords():
-    command = Mock(command='query', query='\'Nothing here\'')
+def test_queryCommandExecuteNoRecords(capsys):
+    command = Mock(command='query', query='Nothing here')
     QueryCommand().execute(command)
-    assert "No records found"
+    cap = capsys.readouterr()
+    assert "No records found" in cap.out
+
+def test_queryCommandExecuteQueryAll(capsys):
+    PriorityCommand().execute()
+    cap = capsys.readouterr()
+    assert "No records found" not in cap.out
 
 def test_deleteCommandExecute():
     DeleteCommand().execute()
