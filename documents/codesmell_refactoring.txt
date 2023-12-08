@@ -1,5 +1,7 @@
-Code smell found on 11/12/2023
+Code smell found on 12/07/2023
 Code Smell - Dead Code
-    Refactoring - Delete dead Code
-link to GitHub where codesmell can be found (lines 16-18, 20-21)    
-https://github.com/brycebien/ASE420-HW8-IndividualProject/blob/3fc1facc6651c22e810257ab916409b7dcdea528/program.py
+    Refactoring - Delete dead code
+link to GitHub where codesmell can be found (program.py lines 6-8  src/commands lines 59-63)
+https://github.com/brycebien/ASE420-HW8-IndividualProject/tree/a100cec4e09b9e0722aa87c7537e5944b37b32d3
+link to GitHub with Refactoring
+https://github.com/brycebien/ASE420-HW8-IndividualProject/tree/0a937eab4c2b671edc86f31fe4a9432f3d465279
