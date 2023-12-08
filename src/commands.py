@@ -21,7 +21,7 @@ class DateParser(object):
             return None
         
     @staticmethod
-    def days_between(start, end):
+    def daysBetween(start, end):
         start_str = DateParser.parse(start)
         end_str = DateParser.parse(end)
 
@@ -29,28 +29,56 @@ class DateParser(object):
         end = datetime.strptime(end_str, '%Y/%m/%d')
         difference = end - start
         return [(start + timedelta(days=i)).date().strftime('%Y/%m/%d') for i in range(difference.days + 1)]
+    
+class RecordSorter(object):
+    @staticmethod
+    def recordSort(records):
+        times = []
+        for record in records:
+            times.append(RecordSorter.getDifferenceInTime(record[2], record[3]).seconds)
+
+        for i in range(len(times)):
+            times[i] = timedelta(seconds=times[i])
+        
+        res = list(zip(records, times))
+        res.sort(key=lambda record: record[1], reverse=True)
+
+        return [record for record, _ in res]      
+
+    @staticmethod
+    def getDifferenceInTime(start, end):
+        if 'am' in start.lower() or 'pm' in start.lower() or 'am' in end.lower() or 'pm' in end.lower():
+            start_time = datetime.strptime(start, '%I:%M%p')
+            end_time = datetime.strptime(end, '%I:%M%p')
+        else:
+            start_time = datetime.strptime(start, '%H:%M')
+            end_time = datetime.strptime(end, '%H:%M')
+        return end_time - start_time
 
     
 class DatabaseManager(object):
     def __init__(self):
-        self.database = Database(DATABASE)
-        self.query_database = QueryDatabase(DATABASE)
-        self.record_database = RecordDatabase(DATABASE)
-        self.delete_database = DeleteDatabase(DATABASE)
+        self.__database = Database(DATABASE)
+        self.__query_database = QueryDatabase(DATABASE)
+        self.__record_database = RecordDatabase(DATABASE)
+        self.__delete_database = DeleteDatabase(DATABASE)
 
     def record(self, inputs):
-        self.record_database.record(inputs)
+        self.__record_database.record(inputs)
 
     def query(self, parameter, method): 
         if method == 'date':
-            self.query_database.queryDate(parameter)
+            self.__query_database.queryDate(parameter)
         elif method == 'tag':
-            self.query_database.queryTag(parameter)
+            self.__query_database.queryTag(parameter)
         else:
-            self.query_database.queryTask(parameter)
+            self.__query_database.queryTask(parameter)
+    
+    def queryAll(self):
+        return self.__query_database.queryAll()
 
     def delete(self):
-        self.delete_database.delete()
+        self.__delete_database.delete()
 
 
 class DeleteCommand(Command):
@@ -91,16 +119,22 @@ class RecordCommand(Command):
 class ReportCommand(Command):
     def __init__(self):
         self.db_manager = DatabaseManager()
-        self.db_manager = DatabaseManager()
 
     def execute(self, command):
-        res = DateParser.days_between(command.start_date, command.end_date)
+        res = DateParser.daysBetween(command.start_date, command.end_date)
         for day in res:
             self.db_manager.query(day, 'date')
-        #query every date from start date to end date and add to list
 
-        #print list?
-        #self.query_database()
+class PriorityCommand(Command):
+    def __init__(self):
+        self.db_manager = DatabaseManager()
+
+    def execute(self):
+        all_queries = self.db_manager.queryAll()
+        records = RecordSorter.recordSort(all_queries)
+        print('Tasks that took the most time from most to least:')
+        for record in records:
+            print(record)
 
 
 class Console(object):
@@ -109,6 +143,7 @@ class Console(object):
         self.query_manager = QueryCommand()
         self.delete_manager = DeleteCommand()
         self.report_manager = ReportCommand()
+        self.priority_manager = PriorityCommand()
 
     def run(self):
         args = self.__parseArgs()
@@ -123,6 +158,8 @@ class Console(object):
             return self.delete_manager.execute()
         if command.command == 'report':
             return self.report_manager.execute(command)
+        if command.command == 'priority':
+            return self.priority_manager.execute()
         
     def __parseArgs(self):
         parser = argparse.ArgumentParser(description='Time Tracker')
@@ -144,6 +181,8 @@ class Console(object):
         report_parser = subparsers.add_parser('report', help='Report all records')
         report_parser.add_argument('start_date', help='Start of date range for report')
         report_parser.add_argument('end_date', help='End of date range for report')
+
+        priority_parser = subparsers.add_parser('priority', help='Return tasks that took up most of your time')
 
 
         return parser.parse_args()

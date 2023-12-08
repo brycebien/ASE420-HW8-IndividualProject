@@ -55,6 +55,13 @@ class QueryDatabase(Database):
             self.__printQuery(self.cur.fetchall())
         except sqlite3.Error as e:
             print("SQL QUERY ERROR: ", e)
+
+    def queryAll(self):
+        try:
+            self.cur.execute('''SELECT * FROM records''')
+            return(self.cur.fetchall())
+        except sqlite3.Error as e:
+            print("SQL QUERY ERROR: ", e)
         
     def __printQuery(self, res):
         for record in res:
