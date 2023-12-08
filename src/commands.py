@@ -70,6 +70,7 @@ class ReportCommand(Command):
     def execute(self, command):
         res = DateParser.daysBetween(command.start_date, command.end_date)
         for day in res:
+            print(f'{day}:')
             self.db_manager.query(day, 'date')
 
 class PriorityCommand(Command):
